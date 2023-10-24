@@ -1,6 +1,15 @@
 package cpsc2150.banking.models;
 public class Mortgage extends AbsMortgage implements IMortgage{
-    public Mortgage(double houseCost, double downPayment, int years, Customer customer) {
+   private double Rate;
+   private double Payment;
+   private Customer Cust;
+   private double DebtToIncomeRatio;
+   private double principal;
+   private int NumberOfPayments;
+   private double PercentDown;
+
+    public Mortgage(double houseCost, double downPayment, int years, Customer cust) {
+
     }
 
     @Override
