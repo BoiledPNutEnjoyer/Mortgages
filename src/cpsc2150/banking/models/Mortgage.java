@@ -25,7 +25,8 @@ public class Mortgage extends AbsMortgage implements IMortgage{
    private double Payment;
    private double DebtToIncomeRatio;
    private double PercentDown;
-   private Customer CurrCustomer;
+   private ICustomer CurrCustomer;
+   private int Years;
 
    /**
     * Constructor to take in necessary info, preform calculations, and use them to
@@ -33,30 +34,35 @@ public class Mortgage extends AbsMortgage implements IMortgage{
     *
     * @pre 0 < houseCost AND 0 <= downPayment AND 0 < years
     * @post Rate = [BASERATE plus an additional percent based off of CurrCustomer's credit score] AND
-    *       principal = houseCost - downPayment AND NumberOfPayments = years * MONTHS_IN_YEAR AND
+    *       principal = houseCost - downPayment AND NumberOfPayments = Years * MONTHS_IN_YEAR AND
     *       Payment = [a value based upon the Rate, NumberOfPayments, and principal] AND
     *       DebtToIncomeRatio = [a value based upon CurrCustomer's monthly debt payments, income, and Payment] AND
-    *       PercentDown = downPercentage AND CurrCustomer = cust
+    *       PercentDown = downPercentage AND CurrCustomer = cust AND Years = years
     *
     * @param houseCost value of price of house
     * @param downPayment value of house already paid for
     * @param years number of years needed to pay off
     * @param cust object that holds info about person requesting loan
     */
-    public Mortgage(double houseCost, double downPayment, int years, Customer cust) {
+    public Mortgage(double houseCost, double downPayment, int years, ICustomer cust) {
         CurrCustomer = cust;
+        Years = years;
         double downPercentage = downPayment/houseCost;
         double apr = BASERATE;
         
-        if (years < MAX_YEARS) {
+        // determine amount to add to apr based on anticipated Years to repay
+        if (Years < MAX_YEARS) {
             apr += GOODRATEADD;
         } else {
             apr += NORMALRATEADD;
         }
+
+        // determine amount to add to apr based on amount paid down
         if (downPercentage < PREFERRED_PERCENT_DOWN) {
             apr += GOODRATEADD;
         }
         
+        // determine amount to add to apr based on CurrCustomer credit score
         if (CurrCustomer.getCreditScore() < BADCREDIT) {
             apr += NORMALRATEADD;
         } else if (CurrCustomer.getCreditScore() >= BADCREDIT && CurrCustomer.getCreditScore() < FAIRCREDIT) {
@@ -76,7 +82,7 @@ public class Mortgage extends AbsMortgage implements IMortgage{
         principal = houseCost - downPayment;
 
         // NumberOfPayments
-        NumberOfPayments = years * MONTHS_IN_YEAR;
+        NumberOfPayments = Years * MONTHS_IN_YEAR;
 
         // Payment / monthly payment
         Payment = (Rate * principal) / (1 - Math.pow((1 + Rate), -1 * (NumberOfPayments)));
@@ -90,31 +96,31 @@ public class Mortgage extends AbsMortgage implements IMortgage{
 
     @Override
     public double getPayment() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getPayment'");
+        return Payment;
     }
 
     @Override
     public double getRate() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getRate'");
+        return Rate * 12;
     }
 
     @Override
     public double getPrincipal() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getPrincipal'");
+        return principal;
     }
 
     @Override
     public int getYears() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getYears'");
+        return Years;
     }
 
     @Override
     public boolean loanApproved() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'loanApproved'");
+        // only return true if meets required qualifications
+        if (((Rate * 12) < RATETOOHIGH) && (DebtToIncomeRatio <= DTOITOOHIGH) && (PercentDown >= MIN_PERCENT_DOWN))
+        {
+            return true;
+        }
+        return false;
     }
 }
