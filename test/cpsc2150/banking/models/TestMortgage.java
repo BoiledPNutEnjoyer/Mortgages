@@ -1,4 +1,4 @@
-package test;
+package test.cpsc2150.banking.models;
 
 import org.junit.Test;
 import java.lang.String;
