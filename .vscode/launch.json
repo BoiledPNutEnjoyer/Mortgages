@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "MortgageApp",
+            "request": "launch",
+            "mainClass": "cpsc2150.banking.MortgageApp",
+            "projectName": "Mortgages_f9d9de55"
+        },
+        {
+            "type": "java",
             "name": "Current File",
             "request": "launch",
             "mainClass": "${file}"

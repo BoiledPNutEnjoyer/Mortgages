@@ -64,7 +64,7 @@ public class Mortgage extends AbsMortgage implements IMortgage{
         
         // determine amount to add to apr based on CurrCustomer credit score
         if (CurrCustomer.getCreditScore() < BADCREDIT) {
-            apr += NORMALRATEADD;
+            apr += VERYBADRATEADD;
         } else if (CurrCustomer.getCreditScore() >= BADCREDIT && CurrCustomer.getCreditScore() < FAIRCREDIT) {
             apr += BADRATEADD;
         } else if (CurrCustomer.getCreditScore() >= FAIRCREDIT && CurrCustomer.getCreditScore() < GOODCREDIT) {
@@ -85,10 +85,10 @@ public class Mortgage extends AbsMortgage implements IMortgage{
         NumberOfPayments = Years * MONTHS_IN_YEAR;
 
         // Payment / monthly payment
-        Payment = (Rate * principal) / (1 - Math.pow((1 + Rate), -1 * (NumberOfPayments)));
+        Payment = ((Rate/MONTHS_IN_YEAR) * principal) / (1 - Math.pow((1 + (Rate/MONTHS_IN_YEAR)), -1 * (NumberOfPayments)));
 
         // DebtToIncomeRatio
-        DebtToIncomeRatio = (CurrCustomer.getMonthlyDebtPayments() + Payment) / CurrCustomer.getIncome();
+        DebtToIncomeRatio = ((CurrCustomer.getMonthlyDebtPayments() * MONTHS_IN_YEAR) + (Payment * MONTHS_IN_YEAR)) / CurrCustomer.getIncome();
 
         // PercentDown
         PercentDown = downPercentage;
@@ -101,7 +101,7 @@ public class Mortgage extends AbsMortgage implements IMortgage{
 
     @Override
     public double getRate() {
-        return Rate * 12;
+        return Rate;
     }
 
     @Override
@@ -117,10 +117,10 @@ public class Mortgage extends AbsMortgage implements IMortgage{
     @Override
     public boolean loanApproved() {
         // only return true if meets required qualifications
-        if (((Rate * 12) < RATETOOHIGH) && (DebtToIncomeRatio <= DTOITOOHIGH) && (PercentDown >= MIN_PERCENT_DOWN))
+        if ((Rate >= RATETOOHIGH) || (PercentDown < MIN_PERCENT_DOWN) || (DebtToIncomeRatio > DTOITOOHIGH))
         {
-            return true;
+            return false;
         }
-        return false;
+        return true;
     }
 }
